@@ -191,7 +191,7 @@ data PEPattern = PEStatic Value | PEDynamic | PECons PEPattern PEPattern
   deriving (Show)
 
 specPatConstruct :: SpecStore -> Pattern' -> EM (PEPattern, SpecStore, Maybe Pattern)
-specPatConstruct s (QConst' BTDynamic c) = return (PEDynamic, s, return $ QConst c)
+specPatConstruct s (QConst' BTDynamic c) = return (PEDynamic, s, Just $ QConst c)
 specPatConstruct s (QConst' BTStatic c) = return (PEStatic c, s, Nothing)
 specPatConstruct s (QVar' BTDynamic n) = return (PEDynamic, s, Just $ QVar n)
 specPatConstruct s (QVar' BTStatic n) =
@@ -213,6 +213,16 @@ specPatConstruct s (Drop n) =
   do n `isDynIn` s
      let s' = set n (Static Nil) s
      return (PEDynamic, s', Just $ QVar n)
+specPatConstruct s (QIndex' BTDynamic n e) =
+  do n `isDynIn` s
+     e' <- getExpr e s
+     return (PEDynamic, s, Just $ QIndex n e')
+specPatConstruct s (QIndex' BTStatic n e) =
+  do v <- find' n s
+     i <- getValue e s >>= getNum
+     (iv, v') <- extractFromList v i
+     let s' = set n (Static v') s
+     return (PEStatic iv, s', Nothing)
 
 -- Nill/dyn handling
 -- static constants can become dynamic from other side of matching
@@ -229,8 +239,9 @@ specPatDeconstruct s (QVar' BTDynamic n) PEDynamic =
 specPatDeconstruct s (QVar' BTStatic n) p =
   do v <- valFromPEPat p
      v' <- find' n s
-     res <- calcR Xor v v'
-     return (set n (Static res) s, Nothing)
+     if v' == Nil
+      then return (set n (Static v) s, Nothing)
+      else Left "Non-nil variable in matching"
 specPatDeconstruct s (QPair' BTDynamic q1 q2) PEDynamic =
   do (s'', q1') <- specPatDeconstruct s   q1 PEDynamic
      (s', q2')  <- specPatDeconstruct s'' q2 PEDynamic
@@ -240,6 +251,14 @@ specPatDeconstruct s (QPair' BTStatic q1 q2) p =
      (s'', q1') <- specPatDeconstruct s q1 p1
      (s', q2') <- specPatDeconstruct s'' q2 p2
      return (s', combinePats q1' q2')
+specPatDeconstruct s (QIndex' BTDynamic n e) PEDynamic =
+  do e' <- getExpr e s
+     return (s, Just $ QIndex n e')
+specPatDeconstruct s (QIndex' BTStatic n e) (PEStatic c) =
+  do i <- getValue e s >>= getNum
+     v <- find' n s
+     v' <- insertInList v c i
+     return (set n (Static v') s, Nothing)
 specPatDeconstruct s (Drop n) _ =
   do v <- find' n s
      let s' = set n Dynamic s

@@ -69,10 +69,14 @@ pUpdate =
 -- parse a pattern for a reversible replacement
 pPattern :: Parser Pattern
 pPattern = choice
-  [ QVar <$> pName
+  [ QVar <$> try (pName <* notFollowedBy (symbol "["))
   , QConst <$> pConstant
   , QPair <$> (symbol "(" *> pPattern) <*> (symbol "." *> pPattern <* symbol ")")
+  , QIndex <$> pName <*> between (symbol "[") (symbol "]") pExpr
+  , makePairs <$> between (symbol "[") (symbol "]") (pPattern `sepBy` symbol ",")
   ] <?> "Expecting pattern"
+  where makePairs [] = QConst Nil
+        makePairs (q:qs) = QPair q $ makePairs qs
 
 pExpr :: Parser Expr
 pExpr = buildExpressionParser table term <?> "expression"

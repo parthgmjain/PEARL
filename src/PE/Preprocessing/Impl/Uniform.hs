@@ -62,6 +62,9 @@ isDynPat (QVar n) = isDynVar n
 isDynPat (QPair q1 q2) =
   do b1 <- isDynPat q1; b2 <- isDynPat q2
      return (b1 || b2)
+isDynPat (QIndex n e) =
+  do b1 <- isDynVar n; b2 <- isDynExpr e
+     return (b1 || b2)
 
 -- Is the expression at least partially dynamic under division
 isDynExpr :: Expr -> ST Bool

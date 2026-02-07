@@ -58,7 +58,12 @@ wellformedPat' d (QPair' l q1 q2) =
      if l == BTDynamic || (l1 == l2 && l2 == BTStatic)
       then return l
       else Left "Type mismatch in pair"
-wellformedPat' _ _ = return BTDynamic
+wellformedPat' d (QIndex' l n e) =
+  do l' <- wellformedExp' d e
+     if get n d == l && l == l'
+      then return l
+      else Left $ "Type mismatch in index: " ++ show l ++ ", " ++ show l'
+wellformedPat' _ (Drop _) = return BTDynamic
 
 wellformedJump' :: Division -> Jump' a -> EM ()
 wellformedJump' _ Exit'         = return ()

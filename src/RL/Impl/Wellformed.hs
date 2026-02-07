@@ -81,6 +81,10 @@ wellformedPat ns (QPair q1 q2) =
   then do wellformedPat ns q1
           wellformedPat ns q2
   else Left "Non-linear pattern"
+wellformedPat ns (QIndex n e) =
+  if n `notElem` getVarsExp e
+  then isDefined n ns
+  else Left "Non-linear pattern with index"
 
 wellformedExp :: [Name] -> Expr -> EM ()
 wellformedExp _ (Const _) = return ()

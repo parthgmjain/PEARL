@@ -156,6 +156,12 @@ construct store (QPair q1' q2') =
   do (store', v)   <- construct store q1'
      (store'', v') <- construct store' q2'
      return (store'', Pair v v')
+construct store (QIndex n e) =
+  do nv <- find n store
+     i <- getIndex store e
+     (iv, nv') <- extractFromList nv i
+     let store' = set n nv' store
+     return (store', iv)
 
 -- deconstruct intermediate value into new store
 -- errors if cannot match
@@ -169,6 +175,11 @@ deconstruct store v (QVar n) =
      if v' == Nil
       then return $ set n v store
       else Left "Non-nill variable in replacement."
+deconstruct store v (QIndex n e) =
+  do i <- getIndex store e
+     nv <- find n store
+     nv' <- insertInList nv v i
+     return $ set n nv' store
 deconstruct store (Pair v1 v2) (QPair q1' q2') =
   do store' <- deconstruct store v1 q1'
      deconstruct store' v2 q2'
@@ -185,6 +196,11 @@ evalExpr s (Op op e1 e2) =
 evalExpr s (UOp op e) =
   do v <- evalExpr s e
      calcU op v
+
+getIndex :: Store -> Expr -> EM IntType
+getIndex s e =
+  do v <- evalExpr s e
+     getNum v
 
 find :: Name -> Store -> EM Value
 find n s =

@@ -87,6 +87,12 @@ annotatePat d d' (QPair q1 q2) =
       (q2', t2) = annotatePat d d' q2
       t = t1 `lub` t2
   in (QPair' BTStatic q1' q2', t)
+annotatePat d _ (QIndex n e) =
+  let t1 = get n d
+      (e', t2) = annotateExp d e
+  in case t1 `lub` t2 of
+    BTStatic -> (QIndex' BTStatic n e', BTStatic)
+    BTDynamic -> (QIndex' BTDynamic n (lift (e', t2)), BTDynamic)
 
 -- Annotate an expression
 annotateExp :: Division -> Expr -> (Expr', Level)

@@ -18,6 +18,19 @@ getVarsPat :: Pattern -> [Name]
 getVarsPat (QConst _) = []
 getVarsPat (QVar n) = [n]
 getVarsPat (QPair q1 q2) = getVarsPat q1 `union` getVarsPat q2
+getVarsPat (QIndex n e) = n : getVarsExp e
+
+getNonIndexedVars :: Pattern -> [Name]
+getNonIndexedVars (QConst _) = []
+getNonIndexedVars (QVar n) = [n]
+getNonIndexedVars (QPair q1 q2) = getNonIndexedVars q1 `union` getNonIndexedVars q2
+getNonIndexedVars (QIndex _ _) = []
+
+getNonExprVars :: Pattern -> [Name]
+getNonExprVars (QConst _) = []
+getNonExprVars (QVar n) = [n]
+getNonExprVars (QPair q1 q2) = getNonExprVars q1 `union` getNonExprVars q2
+getNonExprVars (QIndex n _) = [n]
 
 getVarsExp :: Expr -> [Name]
 getVarsExp (Const _) = []

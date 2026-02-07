@@ -51,7 +51,7 @@ analyseStep d (Update n _ e) = dup $ boundedBy n (analyseExpr d e) d
 analyseStep d (Replacement left right) =
       -- get the extended BTType for the RHS Pattern
   let pRight = analysePat d right
-      varsRight = getVarsPat right
+      varsRight = getNonIndexedVars right
       -- get the extended BTType for the LHS Pattern
       -- Variables from the RHS pattern are considered static
       -- since theyve been nil-cleared
@@ -60,9 +60,9 @@ analyseStep d (Replacement left right) =
       -- Get the least upper bound of the two extended types
       p = pRight `qlub` pLeft
       -- Use this information to set the respective variables in each pattern
-      dRight = updateTypes p right d
-      dLeft = updateTypes p left dTemp
-  in (dRight, dLeft)
+      dPre = updateTypes p right d
+      dPost = updateTypes p left dTemp
+  in (dPre, dPost)
 analyseStep d (Assert _) = dup d
 analyseStep d Skip = dup d
 
@@ -71,12 +71,13 @@ data BTPattern = QStatic | QDynamic | QCons BTPattern BTPattern
 
 updateTypes :: BTPattern -> Pattern -> Division -> Division
 updateTypes QStatic p d =
-  sets (getVarsPat p) BTStatic d
+  sets (getNonExprVars p) BTStatic d
 updateTypes QDynamic p d =
-  sets (getVarsPat p) BTDynamic d
+  sets (getNonExprVars p) BTDynamic d
 updateTypes (QCons q1 q2) (QPair p1 p2) d =
   updateTypes q2 p2 $ updateTypes q1 p1 d
 updateTypes q (QVar n) d = set n (patToLevel q) d
+updateTypes q (QIndex n _) d = set n (patToLevel q) d
 updateTypes _ (QConst _) d = d
 
 -- least-upper-bound of two expanded levels
@@ -113,12 +114,16 @@ analysePat d (QPair q1 q2) =
   let p1 = analysePat d q1
       p2 = analysePat d q2
   in QCons p1 p2
+analysePat d (QIndex n e) =
+  let l1 = get n d
+      l2 = analyseExpr d e
+  in levelToPat $ l1 `lub` l2
 
 -- find level of expression under a division
 analyseExpr :: Division -> Expr -> Level
 analyseExpr _ (Const _)    = BTStatic
 analyseExpr d (Var n)      = get n d
-analyseExpr d (Op _ e1 e2) = analyseExpr d e1  `lub` analyseExpr d e2
+analyseExpr d (Op _ e1 e2) = analyseExpr d e1 `lub` analyseExpr d e2
 analyseExpr d (UOp _ e)    = analyseExpr d e
 
 dup :: a -> (a, a)

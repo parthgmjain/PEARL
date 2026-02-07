@@ -120,6 +120,7 @@ inferConstruct s (QPair q1 q2) =
   let (av1, s'') = inferConstruct s   q1
       (av2, s')  = inferConstruct s'' q2
   in (APair av1 av2, s')
+inferConstruct s (QIndex _ _) = (Any, s)
 
 -- Deconstruct the abstract value, fails if impossible
 inferDeconstruct :: AStore -> Pattern -> AValue -> Maybe AStore
@@ -139,6 +140,10 @@ inferDeconstruct s (QPair q1 q2) av =
           _ -> Nothing
      s' <- inferDeconstruct s q1 av1
      inferDeconstruct s' q2 av2
+inferDeconstruct s (QIndex n _) _ =
+  do let av1 = get n s
+     av2 <- av1 `aglb` APair Any Any
+     return $ set n av2 s
 
 -- Infer the abstract value of an expression
 inferExpr :: AStore -> Expr -> Maybe AValue

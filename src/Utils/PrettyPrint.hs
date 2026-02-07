@@ -90,6 +90,7 @@ prettyPat :: Pattern -> String
 prettyPat (QConst v) = "'" ++ prettyVal v
 prettyPat (QVar n) = n
 prettyPat (QPair q1 q2) = "(" ++ prettyPat q1 ++ " . " ++ prettyPat q2 ++ ")"
+prettyPat (QIndex n e) = n ++ "[" ++ prettyExpr e ++ "]"
 
 prettyExpr :: Expr -> String
 prettyExpr (Const v)     = "'" ++ prettyVal v
@@ -196,6 +197,8 @@ prettyPat' (QVar' BTDynamic n) = "%" ++ n
 prettyPat' (QVar' BTStatic n) =  n
 prettyPat' (QPair' BTDynamic q1 q2) = "%(" ++ prettyPat' q1 ++ " %. " ++ prettyPat' q2 ++ ")"
 prettyPat' (QPair' BTStatic q1 q2) = "(" ++ prettyPat' q1 ++ " . " ++ prettyPat' q2 ++ ")"
+prettyPat' (QIndex' BTDynamic n e) = "%" ++ n ++ "[" ++ prettyExpr' e ++ "]"
+prettyPat' (QIndex' BTStatic n e) = n ++ "[" ++ prettyExpr' e ++ "]"
 prettyPat' (Drop n) = "drop(" ++ n ++ ")"
 
 prettyExpr' :: Expr' -> String

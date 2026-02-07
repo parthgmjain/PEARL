@@ -145,7 +145,7 @@ mergeExits origdecl annotateExit (VariableDecl{input = inp, output = out, temp =
     getExitStore b =
       case jump b of
         Exit s -> s
-        _ -> undefined
+        _ -> error "MissingExit"
     initStep b n =
       let v = toVal $ get n (getExitStore b)
       in case v of
@@ -160,7 +160,7 @@ mergeExits origdecl annotateExit (VariableDecl{input = inp, output = out, temp =
 -- Generalized block merging
 mergeBlocks :: (Block a SpecStore -> Int -> Int -> a) -> (Block a SpecStore -> SpecStore) -> [Name] -> [(Block a SpecStore, Int, Int)]
                 -> (Block a SpecStore, Int, Int, [SpecStore], [Block a SpecStore])
-mergeBlocks _ _ _ [] = undefined
+mergeBlocks _ _ _ [] = error "Empty Block Merger"
 mergeBlocks _ getStore _ [(b, lb, ub)] = (b, lb, ub, [getStore b], [])
 mergeBlocks annotateLab getStore ns es =
   let len = length es `div` 2

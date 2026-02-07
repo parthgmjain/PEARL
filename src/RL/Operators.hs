@@ -55,3 +55,21 @@ getNum _ = Left "Expected an integer."
 getPair :: Value -> EM (Value, Value)
 getPair (Pair v1 v2) = return (v1, v2)
 getPair _ = Left "Expected a pair."
+
+extractFromList :: Value -> IntType -> EM (Value, Value)
+extractFromList (Pair v1 v2) i | i == 0 = return (v1, Pair Nil v2)
+                               | i <  0 = Left "Negative integer in RHS index pattern"
+                               | otherwise =
+        do (iv, nv) <- extractFromList v2 $ i - 1
+           return (iv, Pair v1 nv)
+extractFromList _ _ = Left "Integer out of bounds in RHS index pattern"
+
+insertInList :: Value -> Value -> IntType -> EM Value
+insertInList (Pair v1 v2) v i | i == 0 = if v1 == Nil
+                                        then return $ Pair v v2
+                                        else Left "Non-nill indexed value in replacement"
+                             | i <  0 = Left "Negative integer in LHS index pattern"
+                             | otherwise =
+          do v2' <- insertInList v2 v $ i - 1
+             return (Pair v1 v2')
+insertInList _ _ _ = Left "Integer out of bounds in LHS index pattern"

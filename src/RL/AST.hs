@@ -48,6 +48,7 @@ data Pattern =
     QConst Value
   | QVar Name
   | QPair Pattern Pattern
+  | QIndex Name Expr
   deriving (Eq, Show, Read)
 
 data BinOp =
