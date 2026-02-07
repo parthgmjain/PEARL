@@ -66,6 +66,7 @@ data InterpretOptions = InterpretOptions
   { intFile      :: String
   , intInputFile :: String
   , intVerbose   :: Bool
+  , intRunTime   :: Bool
   }
 
 data BenchOptions = BenchOptions
@@ -132,9 +133,12 @@ interpretParser :: Parser Options
 interpretParser = Interpret <$> (InterpretOptions
                <$> argument str (metavar "<Input RL file>")
                <*> argument str (metavar "<Spec file>")
-               <*> flag True False (long "verbose"
+               <*> flag False True (long "verbose"
                            <> short 'v'
                            <> help "Show messages and info for each phase")
+               <*> flag False True (long "performance"
+                           <> short 'p'
+                           <> help "Show total jumps and steps")
               )
 
 benchParser :: Parser Options
@@ -225,7 +229,6 @@ main = do
     Bench      opts -> benchMain opts
     Optimize   opts -> optimMain opts
     Normalize  opts -> normMain  opts
-  putStrLn "Program completed succesfully!"
 
 invMain :: InvertOptions -> IO ()
 invMain InvertOptions { invInpFile = inputPath
@@ -276,7 +279,8 @@ optimMain OptimizeOptions { optimInput = inputPath
 intMain :: InterpretOptions -> IO ()
 intMain InterpretOptions { intFile = filePath
                          , intInputFile = inputPath
-                         , intVerbose = v} =
+                         , intVerbose = v
+                         , intRunTime = r} =
   do prog <- parseFile "program" v parseProg filePath
      _ <- fromEM "performing wellformedness check of input prog"
               $ wellformedProg prog
@@ -287,9 +291,9 @@ intMain InterpretOptions { intFile = filePath
      let outvals = filter (\(n, _) -> n `elem` output (fst prog))
                     $ toList outStore
      let outstr = map (\(n, val) -> n ++ ": " ++ prettyVal val) outvals
-     putStrLn (unlines outstr)
-     trace v "Execution statistics: "
-     putStrLn $ prettyStats stats
+     putStr (unlines outstr)
+     when r $ do trace v "\nExecution statistics: "
+                 putStrLn $ prettyStats stats
 
 specMain :: SpecOptions -> IO ()
 specMain specOpts@SpecOptions { specInpFile = inputPath
