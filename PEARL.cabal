@@ -4,11 +4,11 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           PERevFlow
+name:           PEARL
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/PERevFlow#readme>
-homepage:       https://github.com/githubuser/PERevFlow#readme
-bug-reports:    https://github.com/githubuser/PERevFlow/issues
+description:    Please see the README on GitHub at <https://github.com/yakokse/PEARL#readme>
+homepage:       https://github.com/yakokse/PEARL#readme
+bug-reports:    https://github.com/yakokse/PEARL/issues
 author:         Author name here
 maintainer:     example@example.com
 copyright:      2023 Author name here
@@ -20,7 +20,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/PERevFlow
+  location: https://github.com/yakokse/PEARL
 
 library
   exposed-modules:
@@ -67,7 +67,7 @@ library
       Utils.Maps
       Utils.PrettyPrint
   other-modules:
-      Paths_PERevFlow
+      Paths_PEARL
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
@@ -83,13 +83,13 @@ library
     , text
   default-language: Haskell2010
 
-executable PERevFlow-exe
+executable PEARL
   main-is: Main.hs
   hs-source-dirs:
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      PERevFlow
+      PEARL
     , array
     , base >=4.7 && <5
     , containers
@@ -101,7 +101,7 @@ executable PERevFlow-exe
     , text
   default-language: Haskell2010
 
-test-suite PERevFlow-test
+test-suite PEARL-test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
@@ -113,12 +113,12 @@ test-suite PERevFlow-test
       PostprocessingTests
       UniformTests
       WellformedTests
-      Paths_PERevFlow
+      Paths_PEARL
   hs-source-dirs:
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      PERevFlow
+      PEARL
     , array
     , base >=4.7 && <5
     , containers
