@@ -19,8 +19,11 @@ parseStr p s = case parse (p <* eof) "" s of
 pConstant :: Parser Value
 pConstant = symbol "'" *> pValue
  where
+  makePairs [] = Nil
+  makePairs (v:vs) = Pair v $ makePairs vs
   pValue = choice
     [ Pair <$> (symbol "(" *> pValue) <*> (symbol "." *> pValue <* symbol ")")
+    , makePairs <$> between (symbol "[") (symbol "]") (pValue `sepBy` symbol ",")
     , Nil <$ word "nil"
     , Atom <$> pName
     , Num <$> pNum

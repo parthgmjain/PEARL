@@ -129,8 +129,16 @@ prettyBTVal Dynamic    = "Dyn"
 prettyVal :: Value -> String
 prettyVal (Atom a) = a
 prettyVal (Num i) = show i
-prettyVal (Pair v1 v2) = "("++ prettyVal v1 ++ "." ++ prettyVal v2 ++ ")"
 prettyVal Nil = "nil"
+prettyVal p@(Pair v1 v2) | isList v2 = "[" ++ intercalate ", " (listify p) ++ "]"
+                         | otherwise = "("++ prettyVal v1 ++ "." ++ prettyVal v2 ++ ")"
+  where isList Nil = True
+        isList (Pair _ v) = isList v
+        isList (Atom _) = False
+        isList (Num _) = False
+        listify (Pair v1' v2') = prettyVal v1' : listify v2'
+        listify Nil = []
+        listify _ = error "Should not be listable"
 
 prettyProg' :: Print a -> Program' a -> String
 prettyProg' f p = intercalate "\n" (concatMap (prettyBlock' f) p)
