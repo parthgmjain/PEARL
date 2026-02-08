@@ -106,7 +106,7 @@ specParser = Specialize <$> (SpecOptions
           <*> flag False True (long "removeAssertions"
                            <> short 'a'
                            <> help "Remove assertions via abstract interpretation")
-          <*> flag True False (long "verbose"
+          <*> flag False True (long "verbose"
                            <> short 'v'
                            <> help "Show messages and info for each phase")
           <*> switch (long "trace"
@@ -124,7 +124,7 @@ inverterParser :: Parser Options
 inverterParser = Invert <$> (InvertOptions
               <$> argument str (metavar "<Input RL file>")
               <*> argument str (metavar "<Output path>")
-              <*> flag True False (long "verbose"
+              <*> flag False True (long "verbose"
                            <> short 'v'
                            <> help "Show messages and info for each phase")
               )
@@ -160,7 +160,7 @@ optimParser = Optimize <$> (OptimizeOptions
            <*> flag False True (long "Bidirectional"
                            <> short 'b'
                            <> help "Use bidirectional analysis instead")
-           <*> flag True False (long "verbose"
+           <*> flag False True (long "verbose"
                            <> short 'v'
                            <> help "Show messages and info for each phase")
            )
@@ -353,7 +353,7 @@ specMain2 specOpts decl prog2 store =
         let prog = if specAssertRem specOpts
                    then removeAllAssertions prog'
                    else prog'
-        printStaticOutput decl staticVals
+        printStaticOutput v decl staticVals
         return $ prettyProg id prog
 
 specPostProcess :: Bool -> VariableDecl -> Program (Explicated Label) (Maybe SpecStore)
@@ -389,13 +389,13 @@ specPostProcess v origdecl (decl, prog) =
      showLength compressed
      return ((decl', compressed), staticVals)
 
-printStaticOutput :: VariableDecl -> [(Name, SpecValue)] -> IO ()
-printStaticOutput decl tpls =
-  do trace True "-- FINAL STATIC OUTPUT --"
+printStaticOutput :: Bool -> VariableDecl -> [(Name, SpecValue)] -> IO ()
+printStaticOutput verbose decl tpls =
+  do trace verbose "-- FINAL STATIC OUTPUT --"
      let outvals = filter (\(n, v) -> n `elem` output decl && v /= Dynamic) tpls
      let strings = map (\(n,v) -> n ++ " = " ++ showSpecVal v) outvals
      putStrLn $ intercalate "\n" strings
-     trace True "-------------------------"
+     trace verbose "-------------------------"
   where
     showSpecVal (Static v) = prettyVal v
     showSpecVal Dynamic = undefined

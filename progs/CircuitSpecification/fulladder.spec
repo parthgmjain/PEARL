@@ -5,9 +5,3 @@ gates = '[
     (CNOT . [1, 2]),
     (CNOT . [0, 1])
 ]
-
-// input
-lines = '[one, nil, one, nil]
-
-// output
-//lines = '[one, nil, nil, one]
