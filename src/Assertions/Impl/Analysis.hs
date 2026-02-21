@@ -120,7 +120,10 @@ inferConstruct s (QPair q1 q2) =
   let (av1, s'') = inferConstruct s   q1
       (av2, s')  = inferConstruct s'' q2
   in (APair av1 av2, s')
-inferConstruct s (QIndex _ _) = (Any, s)
+inferConstruct s (QIndex n _) =
+  let av = get n s `alub` APair Any Any
+      s' = set n av s
+  in (Any, s')
 
 -- Deconstruct the abstract value, fails if impossible
 inferDeconstruct :: AStore -> Pattern -> AValue -> Maybe AStore

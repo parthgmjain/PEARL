@@ -15,9 +15,9 @@ Performs partial evaluation of a program with respect to a given specialization 
 The specialization is given as a sequence of `variable = 'constant` declarations in a file.
 For examples see the "progs" folder.
 
-    Usage: PERevFlow-exe spec <Input RL file> <Output path> <Spec file>
-                              [-u|--uniformBTA] [-s|--skipSpec] [-p|--skipPost]
-                              [-v|--verbose] [-t|--trace]
+    Usage: PEARL spec <Input RL file> <Output path> <Spec file>
+                      [-u|--uniformBTA] [-s|--skipSpec] [-p|--skipPost]
+                      [-v|--verbose] [-t|--trace]
 
 ### Options
  - `-u | --uniformBTA`: Use the uniform binding-time analysis
@@ -28,7 +28,7 @@ For examples see the "progs" folder.
 ## Inversion
 Invert the input program.
 
-    Usage: PERevFlow-exe invert <Input RL file> <Output path> [-v|--verbose]
+    Usage: PEARL invert <Input RL file> <Output path> [-v|--verbose]
 
 ### Options
  - `-v | --verbose`: Enable/Disable the default logging to stdout. Default: Enabled
@@ -38,7 +38,7 @@ Interpret the input program with the given input.
 Shows final output and statistics.
 The input follows the same format as in the specializer.
 
-    Usage: PERevFlow-exe interpret <Input RL file> <Spec file> [-v|--verbose]
+    Usage: PEARL interpret <Input RL file> <Spec file> [-v|--verbose]
 
 ### Options
  - `-v | --verbose`: Enable/Disable the default logging to stdout. Default: Enabled
@@ -48,8 +48,8 @@ Compare the size and speed of a source program for a given input with the size a
 
 The variables that should remain dynamic during specialization are specified in a space-separated list, e.g. `"x y z"`.
 
-    Usage: PERevFlow-exe bench <Input RL file> <Spec file>
-                               <List of dynamic input vars> [-v|--verbose]
+    Usage: PEARL bench <Input RL file> <Spec file>
+                       <List of dynamic input vars> [-v|--verbose]
 
 ### Options
  - `-v | --verbose`: Enable/Disable the default logging to stdout. Default: Enabled
