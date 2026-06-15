@@ -1,0 +1,1 @@
+Program = '((ADDE . (V . (VAR . W))) . ((ADDE . (W . (VAR . V))) . ((ADDE . (V . (VAR . W))) . ((ADDE . (W . (VAR . V))) . ((ADDE . (V . (VAR . W))) . ((ADDE . (W . (VAR . V))) . nil))))))

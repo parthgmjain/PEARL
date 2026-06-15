@@ -1,1 +1,1 @@
-Program = '((ADDE . (N . 5)) . ((SUBE . (V . 3)) . nil))
+Program = '((ADDE . (N . (CONST . 5))) . ((SUBE . (V . (CONST . 3))) . ((ADDE . (W . (VAR . N))) . nil)))
