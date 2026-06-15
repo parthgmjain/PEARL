@@ -12,6 +12,7 @@ import RL.Variables
 import RL.Program
 
 import qualified Control.Monad.State as S
+import Control.Monad (foldM)
 
 type SLEM = S.StateT Stats LEM
 
@@ -126,7 +127,7 @@ evalJump _ (Exit ()) = return Nothing
 
 -- interpret multiple steps
 evalSteps :: Store -> [Step] -> SLEM Store
-evalSteps = S.foldM (\store step -> incStep >> evalStep store step)
+evalSteps = foldM (\store step -> incStep >> evalStep store step)
 
 -- interpret a given step
 evalStep :: Store -> Step -> SLEM Store

@@ -11,6 +11,7 @@ import PE.SpecValues
 import PE.Preprocessing.Division
 
 import qualified Control.Monad.State as S
+import Control.Monad (when)
 
 type ST a = S.State Division a
 
@@ -45,13 +46,13 @@ checkBlock decl b = checkStep decl $ nstep b
 checkStep :: VariableDecl -> Step -> ST ()
 checkStep decl (Update n _ e) =
   do b <- isDynExpr e;
-     S.when b $ setDyn n;
-     S.when (n `elem` output decl) $ setDyn n
+     when b $ setDyn n;
+     when (n `elem` output decl) $ setDyn n
 checkStep decl (Replacement q1 q2) =
   do b1 <- isDynPat q1; b2 <- isDynPat q2
      let ns = getVarsPat (QPair q1 q2)
-     S.when (b1 || b2) $ setDyns ns
-     S.when (any (`elem` output decl) ns) $ setDyns ns
+     when (b1 || b2) $ setDyns ns
+     when (any (`elem` output decl) ns) $ setDyns ns
 checkStep _ (Assert _) = return ()
 checkStep _ Skip = return ()
 
