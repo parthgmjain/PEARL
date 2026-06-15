@@ -4,4 +4,7 @@
 
 init: entry
       CurVal += ConstVal
+      goto stop
+
+stop: from init
       exit
