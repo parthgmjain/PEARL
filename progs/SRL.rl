@@ -1,10 +1,11 @@
-// SRL interpreter v1: x += c
+// SRL interpreter v2: two steps x += c1 then y += c2
 
-(CurVal ConstVal) -> (CurVal ConstVal)
+(CurVal1 CurVal2 ConstVal1 ConstVal2) -> (CurVal1 CurVal2 ConstVal1 ConstVal2)
 
 init: entry
-      CurVal += ConstVal
-      goto stop
+      CurVal1 += ConstVal1
+      goto step2
 
-stop: from init
-      exit
+step2: from init
+       CurVal2 += ConstVal2
+       exit
