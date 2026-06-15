@@ -1,4 +1,1 @@
-ConstVal1 = '5
-ConstVal2 = '7
-ConstVal3 = '4
-ConstVal4 = '9
+Program = '((ADDE . (N . 5)) . ((SUBE . (V . 3)) . nil))

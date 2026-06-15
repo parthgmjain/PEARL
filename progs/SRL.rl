@@ -1,20 +1,55 @@
-// SRL interpreter v3: four step sequence
+// SRL interpreter: ADD and SUB on variables N and V
+// Program: list of (ADDE . (varname . constval)) or (SUBE . (varname . constval))
+// Supported variables: N, V
 
-(CurVal1 CurVal2 CurVal3 CurVal4 ConstVal1 ConstVal2 ConstVal3 ConstVal4)
--> (CurVal1 CurVal2 CurVal3 CurVal4 ConstVal1 ConstVal2 ConstVal3 ConstVal4)
+(Program N V) -> (Program N V)
+with (ProgRev Step Tag VarName ConstVal)
 
 init: entry
-      CurVal1 += ConstVal1
-      goto step2
+      goto act1
 
-step2: from init
-       CurVal2 += ConstVal2
-       goto step3
+act1: fi !ProgRev from init else act2
+      (Step . Program) <- Program
+      (Tag . (VarName . ConstVal)) <- Step
+      if Tag = 'ADDE goto doAdd else doSub
 
-step3: from step2
-       CurVal3 += ConstVal3
-       goto step4
+doAdd: from act1
+       if VarName = 'N goto addN else addV
 
-step4: from step3
-       CurVal4 += ConstVal4
-       exit
+addN: from doAdd
+      N += ConstVal
+      goto addDone
+
+addV: from doAdd
+      V += ConstVal
+      goto addDone
+
+addDone: fi VarName = 'N from addN else addV
+         goto act2
+
+doSub: from act1
+       if VarName = 'N goto subN else subV
+
+subN: from doSub
+      N -= ConstVal
+      goto subDone
+
+subV: from doSub
+      V -= ConstVal
+      goto subDone
+
+subDone: fi VarName = 'N from subN else subV
+         goto act2
+
+act2: fi Tag = 'ADDE from addDone else subDone
+      Step <- (Tag . (VarName . ConstVal))
+      ProgRev <- (Step . ProgRev)
+      if Program goto act1 else reload
+
+reload: fi Program from reload else act2
+        (Step . ProgRev) <- ProgRev
+        Program <- (Step . Program)
+        if ProgRev goto reload else done
+
+done: from reload
+      exit
